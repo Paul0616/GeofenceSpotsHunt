@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Spots Hunt</string>
+    <string name="home_item">Home</string>
+    <string name="settings_item">Spots Location</string>
+</resources>
