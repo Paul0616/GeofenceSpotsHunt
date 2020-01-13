@@ -20,4 +20,7 @@ interface LandmarkDatabaseDao {
 
     @Query("SELECT * FROM landmarks_table WHERE id = :id LIMIT 1")
     fun getLandmarkById(id: String): LandmarkDataObject?
+
+    @Query("SELECT * FROM landmarks_table WHERE wasReached = 0 ORDER BY createdTime LIMIT 1")
+    fun getCurrentLandmark(): LiveData<LandmarkDataObject?>
 }

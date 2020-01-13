@@ -12,14 +12,28 @@
         tools:layout="@layout/home_fragment" >
         <action
             android:id="@+id/action_mainFragment_to_logInFragment"
-            app:destination="@id/logIn"
+            app:destination="@id/mainConfig"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_in_right"
             app:popEnterAnim="@anim/slide_in_right"
             app:popExitAnim="@anim/slide_in_right" />
     </fragment>
     <fragment
-        android:id="@+id/logIn"
+        android:id="@+id/mainConfig"
+        android:name="ro.duoline.spotshunt.fragments.mainConfig.MainConfigFragment"
+        android:label="log_in_fragment"
+        tools:layout="@layout/main_config_fragment" >
+        <action
+            android:id="@+id/action_logIn_to_locationsConfigFragment"
+            app:destination="@id/locationsConfigFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/locationsConfigFragment"
+        android:name="ro.duoline.spotshunt.fragments.locationsConfig.LocationsConfigFragment"
+        android:label="locations_config_fragment"
+        tools:layout="@layout/locations_config_fragment" />
+    <fragment
+        android:id="@+id/logInFragment"
         android:name="ro.duoline.spotshunt.fragments.login.LogInFragment"
         android:label="log_in_fragment"
         tools:layout="@layout/log_in_fragment" />

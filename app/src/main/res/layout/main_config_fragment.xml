@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -10,7 +10,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".fragments.login.LogInFragment">
+        android:background="@color/design_default_color_secondary"
+        tools:context=".fragments.mainConfig.MainConfigFragment">
 
         <TextView
             android:id="@+id/textView"
@@ -19,7 +20,7 @@
             android:layout_margin="20dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:text="@string/login_prompt"
+            android:text="@string/welcome_prompt"
             android:textAlignment="center"
             android:textSize="30sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -34,6 +35,20 @@
             android:background="@color/accent"
             android:padding="10dp"
             android:text="@string/login_btn"
+            android:textColor="@android:color/white"
+            android:textSize="26sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/config_locations_button" />
+
+        <TextView
+            android:id="@+id/config_locations_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:background="@color/accent"
+            android:padding="10dp"
+            android:text="@string/config_locations_btn"
             android:textColor="@android:color/white"
             android:textSize="26sp"
             app:layout_constraintEnd_toEndOf="parent"

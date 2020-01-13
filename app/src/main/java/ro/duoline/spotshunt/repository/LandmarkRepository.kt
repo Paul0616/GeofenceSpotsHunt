@@ -13,7 +13,7 @@ class LandmarkRepository(private val context: Context, private val database: Lan
     }
 
     fun add(landmark: LandmarkDataObject){
-       // val untouchedLandmarks: LiveData<List<LandmarkDataObject>>  = database.getUntouchedLandmarks()
+        val currentLandmark: LiveData<LandmarkDataObject?>  = database.getCurrentLandmark()
 
         //return untouchedLandmarks
     }

@@ -6,7 +6,7 @@
         android:icon="@drawable/ic_home"
         android:title="@string/home_item" />
     <item
-        android:id="@+id/logIn"
+        android:id="@+id/mainConfig"
         android:icon="@drawable/ic_settings"
         android:title="@string/settings_item" />
 </menu>

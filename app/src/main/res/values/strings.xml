@@ -2,4 +2,11 @@
     <string name="app_name">Spots Hunt</string>
     <string name="home_item">Home</string>
     <string name="settings_item">Spots Location</string>
+
+    <string name="login_prompt">Login to set customizations!</string>
+    <string name="welcome_prompt">Welcome to spots location configuration!</string>
+    <string name="login_unsuccessful_msg">Login unsuccessful</string>
+    <string name="login_btn">Login</string>
+    <string name="logout_btn">Logout</string>
+    <string name="config_locations_btn">Locations Config</string>
 </resources>
