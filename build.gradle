@@ -7,6 +7,7 @@ buildscript {
         nav_version = '2.2.0-rc04'
         lifecycle_version = '2.2.0-rc03'
         google_play_version = '17.0.0'
+        room_database_version = '2.2.2'
     }
     repositories {
         google()
