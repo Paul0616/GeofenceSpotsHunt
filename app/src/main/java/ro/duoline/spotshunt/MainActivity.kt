@@ -22,19 +22,6 @@ class MainActivity : AppCompatActivity() {
 
         NavigationUI.setupWithNavController(binding.bottomNavigation, findNavController(R.id.nav_host))
 
-//        binding.bottomNavigation.setOnNavigationItemSelectedListener {
-//            when(it.itemId){
-//                R.id.home -> {
-//                    Snackbar.make(binding.fragmentContainer, "1", Snackbar.LENGTH_SHORT).show()
-//                    true
-//                }
-//                R.id.logIn -> {
-//                    Snackbar.make(binding.main, "2", Snackbar.LENGTH_SHORT).show()
-//                    true
-//                }
-//                else-> false
-//            }
-//        }
     }
 
 }

@@ -10,9 +10,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.firebase.ui.auth.AuthUI
+import com.google.firebase.auth.FirebaseAuth
 import ro.duoline.spotshunt.R
 import ro.duoline.spotshunt.databinding.MainConfigFragmentBinding
-import ro.duoline.spotshunt.fragments.login.LogInFragment
 import ro.duoline.spotshunt.fragments.login.LogInViewModel
 
 
@@ -41,7 +41,7 @@ class MainConfigFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(MainConfigViewModel::class.java)
 
         binding.configLocationsButton.setOnClickListener {
-            findNavController().navigate(MainConfigFragmentDirections.actionLogInToLocationsConfigFragment())
+            findNavController().navigate(MainConfigFragmentDirections.actionMainConfigToLocationsConfigFragment())
         }
 
         binding.authButton.text = getString(R.string.logout_btn)
@@ -54,6 +54,7 @@ class MainConfigFragment : Fragment() {
                 LogInViewModel.AuthenticationState.AUTHENTICATED -> {
                     Log.i(TAG, "LOGAT")
                     binding.authButton.visibility = View.VISIBLE
+                    binding.logingInfo.text = getString(R.string.logging_info) + FirebaseAuth.getInstance().currentUser?.displayName
                 }
                 LogInViewModel.AuthenticationState.UNAUTHENTICATED -> {
                     Log.i(TAG, "NELOGAT")

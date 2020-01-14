@@ -11,7 +11,7 @@
         android:label="main_fragment"
         tools:layout="@layout/home_fragment" >
         <action
-            android:id="@+id/action_mainFragment_to_logInFragment"
+            android:id="@+id/action_mainFragment_to_mainConfig"
             app:destination="@id/mainConfig"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_in_right"
@@ -24,7 +24,7 @@
         android:label="log_in_fragment"
         tools:layout="@layout/main_config_fragment" >
         <action
-            android:id="@+id/action_logIn_to_locationsConfigFragment"
+            android:id="@+id/action_mainConfig_to_locationsConfigFragment"
             app:destination="@id/locationsConfigFragment" />
     </fragment>
     <fragment
