@@ -2,16 +2,22 @@ package ro.duoline.spotshunt.fragments.locationsConfig
 
 import android.Manifest
 import android.annotation.TargetApi
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Criteria
 import android.location.LocationManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -20,6 +26,8 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.material.snackbar.Snackbar
+import ro.duoline.spotshunt.BuildConfig
 
 import ro.duoline.spotshunt.R
 import ro.duoline.spotshunt.databinding.LocationsConfigFragmentBinding
@@ -29,7 +37,8 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
 
     companion object {
         const val TAG = "LocationsConfigFragment"
-        private const val MY_LOCATION_REQUEST_CODE = 119
+        private const val FOREGROUNG_ONLY_PERMISSION_REQUEST_CODE = 119
+        private const val FOREGROUNG_AND_BACKGROUND_PERMISSION_REQUEST_CODE = 120
         fun newInstance() = LocationsConfigFragment()
     }
 
@@ -46,8 +55,7 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
     ): View? {
         binding = LocationsConfigFragmentBinding.inflate(inflater)
         binding.lifecycleOwner = this
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
-        mapFragment.getMapAsync(this)
+
         return binding.root
     }
 
@@ -69,11 +77,52 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
         })
         binding.currentLocation.visibility = View.GONE
         binding.newSpot.visibility = View.GONE
+        locationManager = context?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync(this)
+
+
     }
+
+
+    private fun checkPermissionForLocation() {
+        if(foregroundAndBackgroundLocationPermissionApproved()){
+            Log.i(TAG, "start device location")
+            startDeviceLocation()
+        } else {
+            requestForegraundAndBackgroundPermissions()
+        }
+    }
+
+
+
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.uiSettings.isMapToolbarEnabled = false
+        checkPermissionForLocation()
+        //centerCamera()
+    }
+
+    private fun startDeviceLocation() {
+        Log.i(TAG, "Location tracking will be started here")
+        map.isMyLocationEnabled = true
+        binding.currentLocation.visibility = View.VISIBLE
+        binding.newSpot.visibility = View.VISIBLE
+
+        binding.currentLocation.setOnClickListener {
+            val bestProvider = locationManager.getBestProvider(Criteria(), false)
+            Log.i(TAG, bestProvider)
+            if(foregroundAndBackgroundLocationPermissionApproved()) {
+                val location = locationManager.getLastKnownLocation(bestProvider)
+                Log.i(TAG, "$location")
+                if (location != null) {
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                }
+            }
+        }
+
         //centerCamera()
     }
 
@@ -96,6 +145,52 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
             } else
                 true
         return foregroundLocationApproved && backgroundLocationApproved
+    }
+
+    /*
+    *  Requests ACCESS_FINE_LOCATION and (on Android 10+ (Q) ACCESS_BACKGROUND_LOCATION.
+    */
+    @TargetApi(29)
+    private fun requestForegraundAndBackgroundPermissions() {
+        if(foregroundAndBackgroundLocationPermissionApproved()) return
+
+        var permissionArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
+
+        val requestCode = when{
+            runningQorLater -> {
+                permissionArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                FOREGROUNG_AND_BACKGROUND_PERMISSION_REQUEST_CODE
+            }
+            else -> FOREGROUNG_ONLY_PERMISSION_REQUEST_CODE
+        }
+        Log.i(TAG, "permission must be requested")
+        requestPermissions(permissionArray, requestCode)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (grantResults.isEmpty()
+            || grantResults[0] == PackageManager.PERMISSION_DENIED
+            || (requestCode == FOREGROUNG_AND_BACKGROUND_PERMISSION_REQUEST_CODE
+                    && grantResults[1] == PackageManager.PERMISSION_DENIED)
+        ) {
+            Snackbar.make(binding.main,
+                R.string.permission_denied_explanation,
+                Snackbar.LENGTH_INDEFINITE)
+                .setAction("Settings"){
+                    startActivity(Intent().apply {
+                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                        data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                    })
+                }
+                .show()
+        } else {
+            startDeviceLocation()
+        }
     }
 
 //    private fun centerCamera() {
