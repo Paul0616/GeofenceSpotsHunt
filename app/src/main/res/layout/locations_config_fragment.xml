@@ -7,20 +7,50 @@
 
     </data>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".fragments.locationsConfig.LocationsConfigFragment">
 
 
-        <ImageView
-            android:id="@+id/imageView"
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/android_map" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_gravity="bottom|end"
+            android:layout_margin="8dp"
+            android:orientation="vertical"
+            app:layout_dodgeInsetEdges="bottom">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/currentLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:srcCompat="@drawable/ic_my_location_black_24dp" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/newSpot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                app:srcCompat="@drawable/ic_add_black_24dp" />
+        </LinearLayout>
+
+        <!--        <ImageView-->
+<!--            android:id="@+id/marker"-->
+<!--            android:layout_width="48dp"-->
+<!--            android:layout_height="48dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:layout_marginBottom="24dp"-->
+<!--            android:contentDescription="@string/marker_content_description"-->
+<!--            app:srcCompat="@drawable/ic_twotone_location_on_48px" />-->
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

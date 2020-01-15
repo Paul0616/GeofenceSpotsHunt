@@ -10,4 +10,5 @@
     <string name="logout_btn">Logout</string>
     <string name="config_locations_btn">Locations Config</string>
     <string name="logging_info">You are logged as:</string>
+    <string name="marker_content_description">Marker</string>
 </resources>
