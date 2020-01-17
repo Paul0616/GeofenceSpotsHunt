@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
@@ -30,10 +31,13 @@ import com.google.android.material.snackbar.Snackbar
 import ro.duoline.spotshunt.BuildConfig
 
 import ro.duoline.spotshunt.R
+import ro.duoline.spotshunt.database.LandmarkDatabase
 import ro.duoline.spotshunt.databinding.LocationsConfigFragmentBinding
 import ro.duoline.spotshunt.fragments.login.LogInViewModel
+import ro.duoline.spotshunt.models.LandmarkDataObject
+import ro.duoline.spotshunt.models.showLandmarkInMap
 
-class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
+class LocationsConfigFragment : Fragment(), OnMapReadyCallback {
 
     companion object {
         const val TAG = "LocationsConfigFragment"
@@ -61,7 +65,11 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(LocationsConfigViewModel::class.java)
+        val application = requireNotNull(activity).application
+        val dataSource = LandmarkDatabase.getInstance(application).landmarkDatabaseDao
+        val viewModelFactory = LocationsConfigModelFactory(application, dataSource)
+        viewModel =
+            ViewModelProvider(this, viewModelFactory).get(LocationsConfigViewModel::class.java)
         viewModel.authenticationState.observe(viewLifecycleOwner, Observer { authenticationState ->
             when (authenticationState) {
                 LogInViewModel.AuthenticationState.AUTHENTICATED -> Log.i(TAG, "Authenticated")
@@ -86,15 +94,13 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
 
 
     private fun checkPermissionForLocation() {
-        if(foregroundAndBackgroundLocationPermissionApproved()){
+        if (foregroundAndBackgroundLocationPermissionApproved()) {
             Log.i(TAG, "start device location")
             startDeviceLocation()
         } else {
             requestForegraundAndBackgroundPermissions()
         }
     }
-
-
 
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -113,7 +119,7 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
         binding.currentLocation.setOnClickListener {
             val bestProvider = locationManager.getBestProvider(Criteria(), false)
             Log.i(TAG, bestProvider)
-            if(foregroundAndBackgroundLocationPermissionApproved()) {
+            if (foregroundAndBackgroundLocationPermissionApproved()) {
                 val location = locationManager.getLastKnownLocation(bestProvider)
                 Log.i(TAG, "$location")
                 if (location != null) {
@@ -122,9 +128,33 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
                 }
             }
         }
+        binding.newSpot.setOnClickListener {
+            map?.run {
+                findNavController().navigate(
+                    LocationsConfigFragmentDirections
+                        .actionLocationsConfigFragmentToNewLandmarkFragment(
+                            cameraPosition.target,
+                            cameraPosition.zoom)
+                )
+            }
+        }
 
-        //centerCamera()
+        viewModel.landmarks.observe(this, Observer {
+            if (it != null)
+                showLandmarks(it)
+        })
     }
+
+    private fun showLandmarks(landmarks: List<LandmarkDataObject>) {
+        Log.i(TAG, "${landmarks.size} landmarks")
+        map?.run {
+            clear()
+            for (landmark in landmarks){
+                showLandmarkInMap(context!!, this, landmark)
+            }
+        }
+    }
+
 
     /*
     *  Determines whether the app has the appropriate permissions across Android 10+ and all other
@@ -133,7 +163,10 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
     @TargetApi(29)
     private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
         val foregroundLocationApproved = (PackageManager.PERMISSION_GRANTED ==
-                ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                ActivityCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
                 )
         val backgroundLocationApproved =
             if (runningQorLater) {
@@ -152,11 +185,11 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
     */
     @TargetApi(29)
     private fun requestForegraundAndBackgroundPermissions() {
-        if(foregroundAndBackgroundLocationPermissionApproved()) return
+        if (foregroundAndBackgroundLocationPermissionApproved()) return
 
         var permissionArray = arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
 
-        val requestCode = when{
+        val requestCode = when {
             runningQorLater -> {
                 permissionArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 FOREGROUNG_AND_BACKGROUND_PERMISSION_REQUEST_CODE
@@ -177,10 +210,12 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
             || (requestCode == FOREGROUNG_AND_BACKGROUND_PERMISSION_REQUEST_CODE
                     && grantResults[1] == PackageManager.PERMISSION_DENIED)
         ) {
-            Snackbar.make(binding.main,
+            Snackbar.make(
+                binding.main,
                 R.string.permission_denied_explanation,
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction("Settings"){
+                Snackbar.LENGTH_INDEFINITE
+            )
+                .setAction("Settings") {
                     startActivity(Intent().apply {
                         action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
                         data = Uri.fromParts("package", BuildConfig.APPLICATION_ID, null)
@@ -193,9 +228,4 @@ class LocationsConfigFragment : Fragment() , OnMapReadyCallback {
         }
     }
 
-//    private fun centerCamera() {
-//        val latLng = intent.extras.get(EXTRA_LAT_LNG) as LatLng
-//        val zoom = intent.extras.get(EXTRA_ZOOM) as Float
-//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom))
-//    }
 }

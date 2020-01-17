@@ -4,4 +4,5 @@
     <color name="primaryDark">#3700b3</color>
     <color name="accent">#D81B60</color>
     <color name="secondary">#FFB21A</color>
+    <color name="colorLandmarkFill">#9600574b</color>
 </resources>

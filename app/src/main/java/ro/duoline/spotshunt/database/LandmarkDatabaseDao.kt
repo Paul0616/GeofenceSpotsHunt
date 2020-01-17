@@ -12,8 +12,11 @@ interface LandmarkDatabaseDao {
     @Insert
     fun insertLandmark(landmark: LandmarkDataObject)
 
-    @Query("SELECT COUNT(id) FROM landmarks_table")
-    fun getSize(): Int
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertLandmarks(post: List<LandmarkDataObject>): List<Long>
+
+    @Query("SELECT COUNT(id) FROM landmarks_table WHERE wasReached = 1")
+    fun getTouchedSize(): Int
 
     @Query("SELECT * FROM landmarks_table WHERE wasReached = 0 ORDER BY createdTime")
     fun getUntouchedLandmarks(): LiveData<List<LandmarkDataObject>>
@@ -23,4 +26,5 @@ interface LandmarkDatabaseDao {
 
     @Query("SELECT * FROM landmarks_table WHERE wasReached = 0 ORDER BY createdTime LIMIT 1")
     fun getCurrentLandmark(): LiveData<LandmarkDataObject?>
+
 }
