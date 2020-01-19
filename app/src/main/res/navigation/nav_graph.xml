@@ -52,5 +52,11 @@
         <argument
             android:name="zoom"
             app:argType="float" />
+        <argument
+            android:name="currentIndex"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_newLandmarkFragment_to_locationsConfigFragment"
+            app:destination="@id/locationsConfigFragment" />
     </fragment>
 </navigation>

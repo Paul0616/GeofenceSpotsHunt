@@ -12,4 +12,12 @@
     <string name="logging_info">You are logged as:</string>
     <string name="marker_content_description">Marker</string>
     <string name="permission_denied_explanation">You need to grant location permission to hunt spots location.</string>
+    <string name="instruction_location_title">Set location where you want the landmark?</string>
+    <string name="instruction_radius_title">Choose the radius</string>
+    <string name="instruction_mesage_title">Enter the name and hint for your landmark</string>
+    <string name="radius_description">%1$s meters</string>
+    <string name="instruction_subtitle">Drag the map to set location</string>
+    <string name="continue_description">Continue</string>
+    <string name="name_hint">Give a name to your landmark</string>
+    <string name="hint_hint">Enter a hint to make the landmark easier to find</string>
 </resources>

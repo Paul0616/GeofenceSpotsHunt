@@ -27,6 +27,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.material.snackbar.Snackbar
 import ro.duoline.spotshunt.BuildConfig
 
@@ -37,7 +38,7 @@ import ro.duoline.spotshunt.fragments.login.LogInViewModel
 import ro.duoline.spotshunt.models.LandmarkDataObject
 import ro.duoline.spotshunt.models.showLandmarkInMap
 
-class LocationsConfigFragment : Fragment(), OnMapReadyCallback {
+class LocationsConfigFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     companion object {
         const val TAG = "LocationsConfigFragment"
@@ -52,6 +53,7 @@ class LocationsConfigFragment : Fragment(), OnMapReadyCallback {
     private lateinit var binding: LocationsConfigFragmentBinding
     private lateinit var map: GoogleMap
     private lateinit var locationManager: LocationManager
+    private var landmarksSize: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -106,8 +108,10 @@ class LocationsConfigFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
         map.uiSettings.isMapToolbarEnabled = false
+        map.uiSettings.isMyLocationButtonEnabled = false
+        map.setOnMarkerClickListener(this)
         checkPermissionForLocation()
-        //centerCamera()
+
     }
 
     private fun startDeviceLocation() {
@@ -124,33 +128,56 @@ class LocationsConfigFragment : Fragment(), OnMapReadyCallback {
                 Log.i(TAG, "$location")
                 if (location != null) {
                     val latLng = LatLng(location.latitude, location.longitude)
-                    map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+                    centerCamera(latLng)
+
                 }
             }
         }
         binding.newSpot.setOnClickListener {
-            map?.run {
-                findNavController().navigate(
-                    LocationsConfigFragmentDirections
-                        .actionLocationsConfigFragmentToNewLandmarkFragment(
-                            cameraPosition.target,
-                            cameraPosition.zoom)
-                )
+            if (landmarksSize != null) {
+                val currentIndex = landmarksSize!! + 1
+                map?.run {
+                    findNavController().navigate(
+                        LocationsConfigFragmentDirections
+                            .actionLocationsConfigFragmentToNewLandmarkFragment(
+                                cameraPosition.target,
+                                cameraPosition.zoom,
+                                currentIndex
+                            )
+                    )
+                }
             }
         }
 
         viewModel.landmarks.observe(this, Observer {
-            if (it != null)
+            if (it != null) {
                 showLandmarks(it)
+                if (it.size > 0) {
+                    val lastLandmark = it.last()
+                    if (lastLandmark.latitude != null && lastLandmark.longitude != null) {
+                        val lastLatLng = LatLng(lastLandmark.latitude!!, lastLandmark.longitude!!)
+                        centerCamera(lastLatLng)
+                    }
+
+                }
+            }
         })
     }
 
+    private fun centerCamera(latLng: LatLng) {
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15f))
+    }
+
     private fun showLandmarks(landmarks: List<LandmarkDataObject>) {
-        Log.i(TAG, "${landmarks.size} landmarks")
+        landmarksSize = landmarks.size
+        Log.i(TAG, "${landmarksSize} landmarks")
+
         map?.run {
             clear()
-            for (landmark in landmarks){
-                showLandmarkInMap(context!!, this, landmark)
+            var index = 0
+            for (landmark in landmarks) {
+                index++
+                showLandmarkInMap(context!!, index.toString(), this, landmark)
             }
         }
     }
@@ -226,6 +253,11 @@ class LocationsConfigFragment : Fragment(), OnMapReadyCallback {
         } else {
             startDeviceLocation()
         }
+    }
+
+    override fun onMarkerClick(marker: Marker?): Boolean {
+        Log.i(TAG, "${marker?.tag}")
+        return true
     }
 
 }

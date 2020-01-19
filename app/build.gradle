@@ -56,6 +56,7 @@ dependencies {
     //google-play
     implementation "com.google.android.gms:play-services-maps:$google_play_version"
     implementation "com.google.android.gms:play-services-location:$google_play_version"
+    implementation 'com.google.maps.android:android-maps-utils:0.5'
 
     //firebase-ui-auth
     implementation "com.firebaseui:firebase-ui-auth:$firebase_ui"
